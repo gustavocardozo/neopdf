@@ -1,5 +1,8 @@
 <?php
+namespace NeoPdf;
 require __DIR__.'/vendor/autoload.php';
+
+use DateTime;
 use Spipu\Html2Pdf\Html2Pdf;
 
 /**
@@ -134,20 +137,32 @@ class PDFVoucher extends HTML2PDF {
             $this->html .= "<div class='border-div'>";
             $this->html .= "<table class='responsive-table table-header'>";
             $this->html .= "<tr>";
-            $text = $this->lang($this->voucher["TipoDocumento"]) . ": " . $this->voucher["numeroDocumento"];
-            $this->html .= "<td style='width:50%;'>" . $text . "</td>";
-            $text = $this->lang("Apellido y Nombre / Raz&oacute;n Social") . ": " . strtoupper($this->voucher["nombreCliente"]);
-            $this->html .= "<td class='right-text' style='width:49%;'>" . $text . "</td>";
-            $this->html .= "</tr>";
-            $this->html .= "<tr>";
-            $text = $this->lang("Condici&oacute;n frente al IVA") . ": " . $this->lang($this->voucher["tipoResponsable"]);
-            $this->html .= "<td style='width:50%;'>" . $text . "</td>";
-            $text = $this->lang("Domicilio") . ": " . $this->voucher["domicilioCliente"];
-            $this->html .= "<td class='right-text' style='width:49%;'>" . $text . "</td>";
-            $this->html .= "</tr>";
-            $this->html .= "<tr>";
+
+            $text = $this->lang("C&oacute;digo cliente") . ": " . strtoupper($this->voucher["codigoCliente"]);
+            $this->html .= "<td  style='width:50%;'>" . $text . "</td>";
             $text = $this->lang("Condici&oacute;nes de venta") . ": " . $this->lang($this->voucher["CondicionVenta"]);
-            $this->html .= "<td style='width:10%;'>" . $text . "</td>";
+            $this->html .= "<td class='right-text' style='width:49%;'>" . $text . "</td>";
+
+
+
+            $this->html .= "</tr>";
+            $this->html .= "<tr>";
+
+            $text = $this->lang("Apellido y Nombre / Raz&oacute;n Social") . ": " . strtoupper($this->voucher["nombreCliente"]);
+            $this->html .= "<td style='width:50%;'>" . $text . "</td>";
+
+            $text = $this->lang("Condici&oacute;n frente al IVA") . ": " . $this->lang($this->voucher["tipoResponsable"]);
+            $this->html .= "<td class='right-text' style='width:49%;'>" . $text . "</td>";
+
+            $this->html .= "</tr>";
+            $this->html .= "<tr>";
+
+            $text = $this->lang("Domicilio") . ": " . $this->voucher["domicilioCliente"];
+            $this->html .= "<td style='width:50%;'>" . $text . "</td>";
+
+            $text = $this->lang($this->voucher["TipoDocumento"]) . ": " . $this->voucher["numeroDocumento"];
+            $this->html .= "<td class='right-text' style='width:49%;'>" . $text . "</td>";
+
             $this->html .= "</tr>";
             $this->html .= "</table>";
             $this->html .= "</div>";
@@ -172,7 +187,7 @@ class PDFVoucher extends HTML2PDF {
 
     /**
      * Imprime el detalle para comprobantes tipo A
-     * 
+     *
      * @author NeoComplexx Group S.A.
      */
     function fill_A() {
@@ -208,7 +223,7 @@ class PDFVoucher extends HTML2PDF {
 
     /**
      * Imprime el detalle para comprobantes tipo B
-     * 
+     *
      * @author NeoComplexx Group S.A.
      */
     function fill_B() {
@@ -408,14 +423,14 @@ class PDFVoucher extends HTML2PDF {
                 $text_1 = $this->lang("CAE") .": ";
                 $text_2 = $this->voucher["cae"];
                 $text_3 = $this->lang("Fecha Vto. CAE") .": ";
-            
+
                 $tmp = DateTime::createFromFormat('Y-m-d',$this->voucher["fechaVencimientoCAE"]);
                 $text_4 = date_format($tmp, $this->lang('d/m/Y'));
 
                 $quotation = number_format((float) round($this->voucher["cotizacionMoneda"], 2), 2, '.', '');
                 $text_5 = $this->lang("Moneda") . ": " . $this->lang($this->voucher["codigoMoneda"]) . " | " . $this->lang("Cotizaci&oacute;n") . ": " . $quotation;
             } else {
-                $text_left = $this->lang("Documento no v&aacute;lido como factura");
+                $text_left = isset($this->voucher['omitirFooter']) && $this->voucher['omitirFooter'] ? '' : $this->lang("Documento no v&aacute;lido como factura");
                 $text_1 = "&nbsp;";
                 $text_2 = "&nbsp;";
                 $text_3 = "&nbsp;";
@@ -459,7 +474,7 @@ class PDFVoucher extends HTML2PDF {
     /**
      * Determina si mostrar o no una parte del comprobante
      * @param element TAG del elemento a controlar
-     * 
+     *
      * @author NeoComplexx Group S.A.
      */
     private function show_element($element) {
@@ -474,7 +489,7 @@ class PDFVoucher extends HTML2PDF {
      * Genera un comprobante de AFIP con su correspondiente original/duplicado
      *
      * @param type $logo_path Ubicación de la imágen del logo
-     * 
+     *
      * @author NeoComplexx Group S.A.
      */
     function emitirPDF($logo_path) {
