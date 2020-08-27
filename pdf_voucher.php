@@ -59,11 +59,11 @@ class PDFVoucher extends HTML2PDF {
      *
      * @author NeoComplexx Group S.A.
      */
-    function addVoucherInformation($logo_path, $title) {
+    function addVoucherInformation($logo_path, $title, $status = NULL) {
         if ($this->show_element("header")) {
             if ($title != "") {
                 $this->html .= "<div class='border-div'>";
-                $this->html .= "    <h3 class='center-text'>" . $title . "</h3>";
+                $this->html .= "    <h3 class='center-text'>" . $title  . ( $status == 'canceled' ? ' - <span style="color:red">ANULADA</span>' : '' ) . "</h3>";
                 $this->html .= "</div>";
                 $this->html .= "<div class='border-div'>";
             }
@@ -492,17 +492,17 @@ class PDFVoucher extends HTML2PDF {
      *
      * @author NeoComplexx Group S.A.
      */
-    function emitirPDF($logo_path) {
+    function emitirPDF($logo_path, $status) {
         //ORIGINAL
         $this->html .= "<page>";
-        $this->addVoucherInformation($logo_path, $this->lang("ORIGINAL"));
+        $this->addVoucherInformation($logo_path, $this->lang("ORIGINAL"), $status);
         $this->addReceiverInformation();
         $this->fill();
         $this->footer();
         $this->html .= "</page>";
         $this->html .= "<page>";
         //DUPLICADO
-        $this->addVoucherInformation($logo_path, $this->lang("DUPLICADO"));
+        $this->addVoucherInformation($logo_path, $this->lang("DUPLICADO"), $status);
         $this->addReceiverInformation();
         $this->fill();
         $this->footer();
